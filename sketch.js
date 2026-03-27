@@ -63,7 +63,7 @@ function initGame(){
   }
 }
 
-function draw(){
+function draw(translate(0, -camY);){
 
   background(255,240,245);
 
@@ -170,11 +170,12 @@ function updateCamera(){
   let targetY = player.y - height * 0.4;
 
   if(targetY < camY){
-    camY = lerp(camY, targetY, 0.1);
+    camY = lerp(camY, targetY, 0.15);
   }
 
   camY = max(camY, 0);
 }
+
 
 // GENERATE
 function generatePlatforms(){
