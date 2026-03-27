@@ -10,6 +10,9 @@ let productList = ["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"];
 
 let gameState = "start";
 
+let startTime;
+let timer = 0;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   initGame();
@@ -56,7 +59,7 @@ function initGame(){
 
     platforms.push(p);
 
-    // ✅ PRODUCTS (NO REPEAT + SPACING)
+    // PRODUCTS (NO REPEAT + SPACING)
     if(i % 3 === 0 && products.length < productList.length){
       products.push({
         x: p.x + 50,
@@ -81,14 +84,24 @@ function draw(){
     return;
   }
 
+  timer = floor((millis() - startTime)/1000);
+
   updatePlayer();
-  moveWorld(); // 🔥 KEY FUNCTION
+  moveWorld();
 
   drawPlatforms();
   drawProducts();
   drawPlayer();
   drawSlots();
+  drawTimer();
 
+  // ✅ FALL CHECK (restart)
+  if(player.y > height){
+    gameState = "start";
+    initGame();
+  }
+
+  // END CONDITION
   if(!slots.includes(null)){
     gameState = "end";
   }
@@ -106,10 +119,10 @@ function updatePlayer(){
 
   for(let p of platforms){
 
-    if(player.x > p.x - 10 &&
-       player.x < p.x + p.w + 10 &&
+    if(player.x > p.x - 15 &&
+       player.x < p.x + p.w + 15 &&
        player.y + player.h > p.y &&
-       player.y + player.h < p.y + 20 &&
+       player.y + player.h < p.y + 25 &&
        player.velY > 0){
 
         if(p.type === "boost"){
@@ -121,7 +134,7 @@ function updatePlayer(){
   }
 }
 
-// 🔥 REAL DOODLE JUMP SCROLLING
+// WORLD MOVEMENT
 function moveWorld(){
 
   if(player.y < height * 0.4){
@@ -139,21 +152,7 @@ function moveWorld(){
   }
 }
 
-// DRAW
-function drawPlatforms(){
-
-  for(let p of platforms){
-
-    if(p.type === "boost"){
-      fill(255,200,0); // jump pad visible
-    } else {
-      fill(180);
-    }
-
-    rect(p.x, p.y, p.w, p.h, 10);
-  }
-}
-
+// PRODUCTS
 function drawProducts(){
 
   for(let i=products.length-1;i>=0;i--){
@@ -168,7 +167,8 @@ function drawProducts(){
     textAlign(CENTER);
     text(p.label, p.x, p.y);
 
-    if(dist(player.x, player.y, p.x, p.y) < 30){
+    // ✅ BIGGER HITBOX (fix collection issue)
+    if(dist(player.x, player.y, p.x, p.y) < 45){
       collect(p.label);
       products.splice(i,1);
     }
@@ -180,11 +180,27 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
+// DRAW
+function drawPlatforms(){
+
+  for(let p of platforms){
+
+    if(p.type === "boost"){
+      fill(255,200,0);
+    } else {
+      fill(180);
+    }
+
+    rect(p.x, p.y, p.w, p.h, 10);
+  }
+}
+
 function drawPlayer(){
   fill(0,200,255);
   rect(player.x, player.y, player.w, player.h,10);
 }
 
+// UI
 function drawSlots(){
 
   let spacing = 90;
@@ -205,7 +221,13 @@ function drawSlots(){
   }
 }
 
-// UI
+function drawTimer(){
+  fill(0);
+  textSize(16);
+  text("Time: " + timer + "s", 20, 30);
+}
+
+// START
 function drawStart(){
   textAlign(CENTER,CENTER);
   textSize(26);
@@ -213,11 +235,38 @@ function drawStart(){
   text("Tap to Start", width/2, height/2);
 }
 
+// 🔥 FINAL END SCREEN
 function drawEnd(){
+
   background(255,240,245);
+
   textAlign(CENTER);
+  fill(0);
+
   textSize(28);
-  text("Your Picks ✨", width/2, height/2);
+  text("Your Picks ✨", width/2, 100);
+
+  for(let i=0;i<3;i++){
+    let x = width/2 - 120 + i*120;
+
+    fill(255);
+    rect(x,150,90,90,15);
+
+    if(slots[i]){
+      fill(0);
+      textSize(12);
+      text(slots[i], x+45, 200);
+    }
+  }
+
+  textSize(20);
+  text("Time: " + timer + "s", width/2, 300);
+
+  textSize(18);
+  text("Use Code: NYKAA20 💖", width/2, 340);
+
+  textSize(14);
+  text("Tap to restart", width/2, 380);
 }
 
 // INPUT
@@ -225,11 +274,13 @@ function touchStarted(){
 
   if(gameState === "start"){
     gameState = "play";
+    startTime = millis();
     return false;
   }
 
   if(gameState === "end"){
-    location.reload();
+    initGame();
+    gameState = "start";
     return false;
   }
 
