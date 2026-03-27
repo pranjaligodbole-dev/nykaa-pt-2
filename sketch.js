@@ -9,8 +9,9 @@ let slots = [null, null, null];
 let gameState = "start";
 
 let camY = 0;
-let startTime;
-let timer = 0;
+let highestPlayerY;
+
+let productList = ["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -30,7 +31,9 @@ function initGame(){
   platforms = [];
   products = [];
   slots = [null, null, null];
+
   camY = 0;
+  highestPlayerY = player.y;
 
   // START PLATFORM
   platforms.push({
@@ -41,25 +44,32 @@ function initGame(){
     type: "normal"
   });
 
-  // generate initial platforms
-  for(let i=1;i<12;i++){
-    let y = height - 80 - i * 110;
+  let gap = 120;
+
+  // 🔥 generate platforms
+  for(let i=1;i<20;i++){
+
+    let y = height - 80 - i * gap;
+
+    let type = (i % 5 === 0) ? "boost" : "normal"; // visible jump pads
 
     let p = {
       x: random(40, width-140),
       y: y,
       w: 120,
       h: 20,
-      type: random() < 0.25 ? "boost" : "normal"
+      type: type
     };
 
     platforms.push(p);
 
-    if(random() < 0.8){
+    // 🔥 PRODUCTS (NO REPEAT, SPACED)
+    if(i % 3 === 0 && products.length < productList.length){
+
       products.push({
-        x: p.x + random(20,80),
-        y: y - 35,
-        label: randomProduct()
+        x: p.x + 50,
+        y: y - 40,
+        label: productList[products.length] // no repeat
       });
     }
   }
@@ -79,11 +89,8 @@ function draw(){
     return;
   }
 
-  timer = floor((millis() - startTime)/1000);
-
   updatePlayer();
   updateCamera();
-  generatePlatforms();
 
   push();
   translate(0, -camY);
@@ -95,7 +102,6 @@ function draw(){
   pop();
 
   drawSlots();
-  drawTimer();
 
   if(!slots.includes(null)){
     gameState = "end";
@@ -131,10 +137,6 @@ function drawEnd(){
       text(slots[i], x+45, 250);
     }
   }
-
-  textSize(20);
-  text("Time: " + timer + "s", width/2, 320);
-  text("20% OFF 💖", width/2, 360);
 }
 
 // PLAYER
@@ -156,62 +158,25 @@ function updatePlayer(){
        player.velY > 0){
 
         if(p.type === "boost"){
-          player.velY = jumpForce * 1.8; // 🚀 boost
+          player.velY = jumpForce * 1.8;
         } else {
           player.velY = jumpForce;
         }
     }
   }
-
-  // safety reset
-  if(player.y > camY + height + 100){
-    player.y = height - 150;
-    player.velY = 0;
-  }
 }
 
-// 🔥 FIXED CAMERA (THIS ONE WORKS)
+// 🔥 CAMERA (FINAL FIX)
 function updateCamera(){
 
-  let threshold = camY + height * 0.4;
-
-  if(player.y < threshold){
-    camY = player.y - height * 0.4;
+  // track highest position reached
+  if(player.y < highestPlayerY){
+    highestPlayerY = player.y;
   }
+
+  camY = highestPlayerY - height * 0.4;
 
   camY = max(camY, 0);
-}
-
-// GENERATE
-function generatePlatforms(){
-
-  let highestY = platforms[platforms.length-1].y;
-
-  while(highestY > camY - height){
-
-    highestY -= 110;
-
-    let p = {
-      x: random(40, width-140),
-      y: highestY,
-      w: 120,
-      h: 20,
-      type: random() < 0.25 ? "boost" : "normal"
-    };
-
-    platforms.push(p);
-
-    if(random() < 0.8){
-      products.push({
-        x: p.x + random(20,80),
-        y: highestY - 35,
-        label: randomProduct()
-      });
-    }
-  }
-
-  platforms = platforms.filter(p => p.y < camY + height + 100);
-  products = products.filter(p => p.y < camY + height + 100);
 }
 
 // PRODUCTS
@@ -240,7 +205,7 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
-// 🎯 SLOTS
+// SLOTS
 function drawSlots(){
 
   let spacing = 90;
@@ -261,21 +226,13 @@ function drawSlots(){
   }
 }
 
-// TIMER
-function drawTimer(){
-  fill(0);
-  textSize(16);
-  textAlign(LEFT);
-  text("Time: " + timer + "s", 20, 30);
-}
-
 // DRAW
 function drawPlatforms(){
 
   for(let p of platforms){
 
     if(p.type === "boost"){
-      fill(255, 200, 0); // 🌼 jump pad
+      fill(255, 200, 0); // 🌼 visible jump pad
     } else {
       fill(180);
     }
@@ -294,7 +251,6 @@ function touchStarted(){
 
   if(gameState === "start"){
     gameState = "play";
-    startTime = millis();
     return false;
   }
 
@@ -305,11 +261,6 @@ function touchStarted(){
 
   player.velY = jumpForce;
   return false;
-}
-
-// PRODUCTS
-function randomProduct(){
-  return random(["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"]);
 }
 
 function windowResized(){
