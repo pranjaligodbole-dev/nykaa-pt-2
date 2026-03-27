@@ -7,7 +7,10 @@ let products = [];
 let slots = [null, null, null];
 
 let gameState = "start";
+
 let camY = 0;
+let timer = 0;
+let startTime;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -26,8 +29,9 @@ function initGame(){
 
   platforms = [];
   products = [];
+  slots = [null, null, null];
 
-  // ✅ STRONG START PLATFORM
+  // START PLATFORM
   platforms.push({
     x: width/2 - 60,
     y: height - 80,
@@ -35,7 +39,7 @@ function initGame(){
     h: 20
   });
 
-  // generate above
+  // generate platforms + MORE PRODUCTS
   for(let i=1;i<12;i++){
     let y = height - 80 - i * 110;
 
@@ -48,9 +52,10 @@ function initGame(){
 
     platforms.push(p);
 
-    if(i % 2 === 0){
+    // 🔥 more products (almost every platform)
+    if(random() < 0.8){
       products.push({
-        x: p.x + 50,
+        x: p.x + random(20,80),
         y: y - 35,
         label: randomProduct()
       });
@@ -72,6 +77,9 @@ function draw(){
     return;
   }
 
+  // ⏱ TIMER
+  timer = floor((millis() - startTime)/1000);
+
   updatePlayer();
   updateCamera();
   generatePlatforms();
@@ -86,6 +94,7 @@ function draw(){
   pop();
 
   drawSlots();
+  drawTimer();
 
   if(!slots.includes(null)){
     gameState = "end";
@@ -123,7 +132,8 @@ function drawEnd(){
   }
 
   textSize(20);
-  text("20% OFF 💖", width/2, 350);
+  text("Time: " + timer + "s", width/2, 320);
+  text("20% OFF 💖", width/2, 360);
 }
 
 // PLAYER
@@ -137,8 +147,6 @@ function updatePlayer(){
   player.y += player.velY;
 
   for(let p of platforms){
-
-    // MUCH MORE FORGIVING COLLISION
     if(player.x > p.x - 10 &&
        player.x < p.x + p.w + 10 &&
        player.y + player.h > p.y &&
@@ -156,9 +164,15 @@ function updatePlayer(){
   }
 }
 
-// CAMERA
+// 🔥 FIXED CAMERA
 function updateCamera(){
-  camY = player.y - height/2;
+
+  let targetY = player.y - height * 0.4;
+
+  if(targetY < camY){
+    camY = lerp(camY, targetY, 0.1);
+  }
+
   camY = max(camY, 0);
 }
 
@@ -180,16 +194,15 @@ function generatePlatforms(){
 
     platforms.push(p);
 
-    if(random() < 0.5){
+    if(random() < 0.8){
       products.push({
-        x: p.x + 50,
+        x: p.x + random(20,80),
         y: highestY - 35,
         label: randomProduct()
       });
     }
   }
 
-  // cleanup
   platforms = platforms.filter(p => p.y < camY + height + 100);
   products = products.filter(p => p.y < camY + height + 100);
 }
@@ -220,11 +233,14 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
-// UI
+// 🎯 BUNDLE SLOTS (CENTER BOTTOM)
 function drawSlots(){
 
+  let spacing = 90;
+  let startX = width/2 - spacing;
+
   for(let i=0;i<3;i++){
-    let x = width/2 - 90 + i*90;
+    let x = startX + i*spacing;
 
     fill(255);
     rect(x, height-90, 70, 70, 12);
@@ -236,6 +252,14 @@ function drawSlots(){
       text(slots[i], x+35, height-55);
     }
   }
+}
+
+// ⏱ TIMER UI
+function drawTimer(){
+  fill(0);
+  textSize(16);
+  textAlign(LEFT);
+  text("Time: " + timer + "s", 20, 30);
 }
 
 // DRAW
@@ -256,6 +280,7 @@ function touchStarted(){
 
   if(gameState === "start"){
     gameState = "play";
+    startTime = millis();
     return false;
   }
 
