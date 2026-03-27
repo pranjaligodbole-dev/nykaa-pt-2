@@ -9,8 +9,8 @@ let slots = [null, null, null];
 let gameState = "start";
 
 let camY = 0;
-let timer = 0;
 let startTime;
+let timer = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -30,16 +30,18 @@ function initGame(){
   platforms = [];
   products = [];
   slots = [null, null, null];
+  camY = 0;
 
   // START PLATFORM
   platforms.push({
     x: width/2 - 60,
     y: height - 80,
     w: 120,
-    h: 20
+    h: 20,
+    type: "normal"
   });
 
-  // generate platforms + MORE PRODUCTS
+  // generate initial platforms
   for(let i=1;i<12;i++){
     let y = height - 80 - i * 110;
 
@@ -47,12 +49,12 @@ function initGame(){
       x: random(40, width-140),
       y: y,
       w: 120,
-      h: 20
+      h: 20,
+      type: random() < 0.25 ? "boost" : "normal"
     };
 
     platforms.push(p);
 
-    // 🔥 more products (almost every platform)
     if(random() < 0.8){
       products.push({
         x: p.x + random(20,80),
@@ -63,7 +65,7 @@ function initGame(){
   }
 }
 
-function draw(translate(0, -camY);){
+function draw(){
 
   background(255,240,245);
 
@@ -77,7 +79,6 @@ function draw(translate(0, -camY);){
     return;
   }
 
-  // ⏱ TIMER
   timer = floor((millis() - startTime)/1000);
 
   updatePlayer();
@@ -147,35 +148,39 @@ function updatePlayer(){
   player.y += player.velY;
 
   for(let p of platforms){
+
     if(player.x > p.x - 10 &&
        player.x < p.x + p.w + 10 &&
        player.y + player.h > p.y &&
        player.y + player.h < p.y + 25 &&
        player.velY > 0){
 
-        player.velY = jumpForce;
+        if(p.type === "boost"){
+          player.velY = jumpForce * 1.8; // 🚀 boost
+        } else {
+          player.velY = jumpForce;
+        }
     }
   }
 
-  // reset safety
+  // safety reset
   if(player.y > camY + height + 100){
     player.y = height - 150;
     player.velY = 0;
   }
 }
 
-// 🔥 FIXED CAMERA
+// 🔥 FIXED CAMERA (THIS ONE WORKS)
 function updateCamera(){
 
-  let targetY = player.y - height * 0.4;
+  let threshold = camY + height * 0.4;
 
-  if(targetY < camY){
-    camY = lerp(camY, targetY, 0.15);
+  if(player.y < threshold){
+    camY = player.y - height * 0.4;
   }
 
   camY = max(camY, 0);
 }
-
 
 // GENERATE
 function generatePlatforms(){
@@ -190,7 +195,8 @@ function generatePlatforms(){
       x: random(40, width-140),
       y: highestY,
       w: 120,
-      h: 20
+      h: 20,
+      type: random() < 0.25 ? "boost" : "normal"
     };
 
     platforms.push(p);
@@ -234,7 +240,7 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
-// 🎯 BUNDLE SLOTS (CENTER BOTTOM)
+// 🎯 SLOTS
 function drawSlots(){
 
   let spacing = 90;
@@ -255,7 +261,7 @@ function drawSlots(){
   }
 }
 
-// ⏱ TIMER UI
+// TIMER
 function drawTimer(){
   fill(0);
   textSize(16);
@@ -265,8 +271,15 @@ function drawTimer(){
 
 // DRAW
 function drawPlatforms(){
-  fill(180);
+
   for(let p of platforms){
+
+    if(p.type === "boost"){
+      fill(255, 200, 0); // 🌼 jump pad
+    } else {
+      fill(180);
+    }
+
     rect(p.x,p.y,p.w,p.h,10);
   }
 }
