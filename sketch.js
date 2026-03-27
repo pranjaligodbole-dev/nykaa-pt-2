@@ -6,12 +6,9 @@ let platforms = [];
 let products = [];
 let slots = [null, null, null];
 
-let gameState = "start";
-
-let camY = 0;
-let highestPlayerY;
-
 let productList = ["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"];
+
+let gameState = "start";
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -32,9 +29,6 @@ function initGame(){
   products = [];
   slots = [null, null, null];
 
-  camY = 0;
-  highestPlayerY = player.y;
-
   // START PLATFORM
   platforms.push({
     x: width/2 - 60,
@@ -46,12 +40,11 @@ function initGame(){
 
   let gap = 120;
 
-  // 🔥 generate platforms
   for(let i=1;i<20;i++){
 
     let y = height - 80 - i * gap;
 
-    let type = (i % 5 === 0) ? "boost" : "normal"; // visible jump pads
+    let type = (i % 5 === 0) ? "boost" : "normal";
 
     let p = {
       x: random(40, width-140),
@@ -63,13 +56,12 @@ function initGame(){
 
     platforms.push(p);
 
-    // 🔥 PRODUCTS (NO REPEAT, SPACED)
+    // ✅ PRODUCTS (NO REPEAT + SPACING)
     if(i % 3 === 0 && products.length < productList.length){
-
       products.push({
         x: p.x + 50,
         y: y - 40,
-        label: productList[products.length] // no repeat
+        label: productList[products.length]
       });
     }
   }
@@ -90,52 +82,15 @@ function draw(){
   }
 
   updatePlayer();
-  updateCamera();
-
-  push();
-  translate(0, -camY);
+  moveWorld(); // 🔥 KEY FUNCTION
 
   drawPlatforms();
   drawProducts();
   drawPlayer();
-
-  pop();
-
   drawSlots();
 
   if(!slots.includes(null)){
     gameState = "end";
-  }
-}
-
-// START
-function drawStart(){
-  textAlign(CENTER,CENTER);
-  textSize(26);
-  fill(0);
-  text("Tap to Start", width/2, height/2);
-}
-
-// END
-function drawEnd(){
-  background(255,240,245);
-
-  textAlign(CENTER);
-  textSize(28);
-  fill(0);
-  text("Your Picks ✨", width/2, 120);
-
-  for(let i=0;i<3;i++){
-    let x = width/2 - 120 + i*120;
-
-    fill(255);
-    rect(x,200,90,90,15);
-
-    if(slots[i]){
-      fill(0);
-      textSize(12);
-      text(slots[i], x+45, 250);
-    }
   }
 }
 
@@ -154,7 +109,7 @@ function updatePlayer(){
     if(player.x > p.x - 10 &&
        player.x < p.x + p.w + 10 &&
        player.y + player.h > p.y &&
-       player.y + player.h < p.y + 25 &&
+       player.y + player.h < p.y + 20 &&
        player.velY > 0){
 
         if(p.type === "boost"){
@@ -166,23 +121,43 @@ function updatePlayer(){
   }
 }
 
-// 🔥 CAMERA (FINAL FIX)
-function updateCamera(){
+// 🔥 REAL DOODLE JUMP SCROLLING
+function moveWorld(){
 
-  // track highest position reached
-  if(player.y < highestPlayerY){
-    highestPlayerY = player.y;
+  if(player.y < height * 0.4){
+
+    let diff = height * 0.4 - player.y;
+    player.y = height * 0.4;
+
+    for(let p of platforms){
+      p.y += diff;
+    }
+
+    for(let pr of products){
+      pr.y += diff;
+    }
   }
-
-  camY = highestPlayerY - height * 0.4;
-
-  camY = max(camY, 0);
 }
 
-// PRODUCTS
+// DRAW
+function drawPlatforms(){
+
+  for(let p of platforms){
+
+    if(p.type === "boost"){
+      fill(255,200,0); // jump pad visible
+    } else {
+      fill(180);
+    }
+
+    rect(p.x, p.y, p.w, p.h, 10);
+  }
+}
+
 function drawProducts(){
 
   for(let i=products.length-1;i>=0;i--){
+
     let p = products[i];
 
     fill(255,180,200);
@@ -205,7 +180,11 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
-// SLOTS
+function drawPlayer(){
+  fill(0,200,255);
+  rect(player.x, player.y, player.w, player.h,10);
+}
+
 function drawSlots(){
 
   let spacing = 90;
@@ -226,24 +205,19 @@ function drawSlots(){
   }
 }
 
-// DRAW
-function drawPlatforms(){
-
-  for(let p of platforms){
-
-    if(p.type === "boost"){
-      fill(255, 200, 0); // 🌼 visible jump pad
-    } else {
-      fill(180);
-    }
-
-    rect(p.x,p.y,p.w,p.h,10);
-  }
+// UI
+function drawStart(){
+  textAlign(CENTER,CENTER);
+  textSize(26);
+  fill(0);
+  text("Tap to Start", width/2, height/2);
 }
 
-function drawPlayer(){
-  fill(0,200,255);
-  rect(player.x, player.y, player.w, player.h,10);
+function drawEnd(){
+  background(255,240,245);
+  textAlign(CENTER);
+  textSize(28);
+  text("Your Picks ✨", width/2, height/2);
 }
 
 // INPUT
