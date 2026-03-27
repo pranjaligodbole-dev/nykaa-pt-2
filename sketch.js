@@ -9,7 +9,6 @@ let slots = [null, null, null];
 let gameState = "start";
 
 let camY = 0;
-let speed = 2;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -20,7 +19,7 @@ function initGame(){
 
   player = {
     x: width/2,
-    y: height - 100,
+    y: height - 120,
     w: 30,
     h: 40,
     velY: 0
@@ -29,21 +28,30 @@ function initGame(){
   platforms = [];
   products = [];
 
-  // generate vertical platforms
-  for(let i=0;i<10;i++){
+  // ✅ START PLATFORM (fixes falling bug)
+  platforms.push({
+    x: width/2 - 50,
+    y: height - 60,
+    w: 100,
+    h: 20
+  });
+
+  // generate platforms above
+  for(let i=1;i<10;i++){
     let y = height - i * 120;
 
-    platforms.push({
+    let p = {
       x: random(50, width-100),
       y: y,
-      w: 100,
+      w: 110,
       h: 20
-    });
+    };
 
-    // attach product randomly
+    platforms.push(p);
+
     if(i % 2 === 0){
       products.push({
-        x: platforms[i].x + 30,
+        x: p.x + 40,
         y: y - 30,
         label: randomProduct()
       });
@@ -131,16 +139,22 @@ function updatePlayer(){
   player.velY += gravity;
   player.y += player.velY;
 
-  // collision
+  // collision (fixed)
   for(let p of platforms){
     if(player.x > p.x &&
        player.x < p.x + p.w &&
        player.y + player.h > p.y &&
-       player.y + player.h < p.y + 10 &&
+       player.y + player.h < p.y + 15 &&
        player.velY > 0){
 
         player.velY = jumpForce;
     }
+  }
+
+  // safety reset (optional)
+  if(player.y > camY + height + 200){
+    player.y = height - 120;
+    player.velY = 0;
   }
 }
 
@@ -156,29 +170,27 @@ function generatePlatforms(){
   if(platforms.length < 15){
 
     let lastY = platforms[platforms.length-1].y;
-
     let newY = lastY - 120;
 
     let newPlatform = {
       x: random(50, width-100),
       y: newY,
-      w: 100,
+      w: 110,
       h: 20
     };
 
     platforms.push(newPlatform);
 
-    // add product randomly
     if(random() < 0.5){
       products.push({
-        x: newPlatform.x + 30,
+        x: newPlatform.x + 40,
         y: newY - 30,
         label: randomProduct()
       });
     }
   }
 
-  // remove off screen
+  // cleanup
   platforms = platforms.filter(p => p.y < camY + height + 100);
   products = products.filter(p => p.y < camY + height + 100);
 }
@@ -256,13 +268,11 @@ function touchStarted(){
     return false;
   }
 
-  // jump on tap
   player.velY = jumpForce;
-
   return false;
 }
 
-// 🧴 PRODUCT LIST
+// 🧴 PRODUCTS LIST
 function randomProduct(){
   let items = ["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"];
   return random(items);
