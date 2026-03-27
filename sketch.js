@@ -205,18 +205,23 @@ function drawSlots(){
 
   let spacing = 90;
   let startX = width/2 - spacing;
+  let y = height - 140;
+
+  // background tray
+  fill(255, 255, 255, 220);
+  rect(width/2 - 140, y - 20, 280, 110, 20);
 
   for(let i=0;i<3;i++){
     let x = startX + i*spacing;
 
     fill(255);
-    rect(x, height-90, 70, 70, 12);
+    rect(x, y, 70, 70, 12);
 
     if(slots[i]){
       fill(0);
       textSize(10);
       textAlign(CENTER,CENTER);
-      text(slots[i], x+35, height-55);
+      text(slots[i], x+35, y+35);
     }
   }
 }
