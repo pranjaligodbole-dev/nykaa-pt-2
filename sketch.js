@@ -205,14 +205,10 @@ function drawSlots(){
 
   let spacing = 90;
   let startX = width/2 - spacing;
-  let y = height - 140;
-
-  // background tray
-  fill(255, 255, 255, 220);
-  rect(width/2 - 140, y - 20, 280, 110, 20);
 
   for(let i=0;i<3;i++){
     let x = startX + i*spacing;
+    let y = height - 90; // 🔁 original position
 
     fill(255);
     rect(x, y, 70, 70, 12);
