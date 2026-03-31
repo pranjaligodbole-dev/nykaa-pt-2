@@ -47,7 +47,8 @@ function initGame(){
 
     let y = height - 80 - i * gap;
 
-    let type = (i % 5 === 0) ? "boost" : "normal";
+    // ✅ REMOVED BOOST (all normal now)
+    let type = "normal";
 
     let p = {
       x: random(40, width-140),
@@ -79,6 +80,12 @@ function draw(){
     return;
   }
 
+  // ✅ NEW HOW SCREEN
+  if(gameState === "how"){
+    drawHowTo();
+    return;
+  }
+
   if(gameState === "end"){
     drawEnd();
     return;
@@ -95,7 +102,7 @@ function draw(){
   drawSlots();
   drawTimer();
 
-  // ✅ FALL CHECK (restart)
+  // FALL CHECK
   if(player.y > height){
     gameState = "start";
     initGame();
@@ -125,11 +132,8 @@ function updatePlayer(){
        player.y + player.h < p.y + 25 &&
        player.velY > 0){
 
-        if(p.type === "boost"){
-          player.velY = jumpForce * 1.8;
-        } else {
-          player.velY = jumpForce;
-        }
+        // ✅ ONLY NORMAL JUMP NOW
+        player.velY = jumpForce;
     }
   }
 }
@@ -167,7 +171,6 @@ function drawProducts(){
     textAlign(CENTER);
     text(p.label, p.x, p.y);
 
-    // ✅ BIGGER HITBOX (fix collection issue)
     if(dist(player.x, player.y, p.x, p.y) < 45){
       collect(p.label);
       products.splice(i,1);
@@ -182,15 +185,8 @@ function collect(label){
 
 // DRAW
 function drawPlatforms(){
-
   for(let p of platforms){
-
-    if(p.type === "boost"){
-      fill(255,200,0);
-    } else {
-      fill(180);
-    }
-
+    fill(180);
     rect(p.x, p.y, p.w, p.h, 10);
   }
 }
@@ -208,7 +204,7 @@ function drawSlots(){
 
   for(let i=0;i<3;i++){
     let x = startX + i*spacing;
-    let y = height - 90; // 🔁 original position
+    let y = height - 90;
 
     fill(255);
     rect(x, y, 70, 70, 12);
@@ -236,7 +232,26 @@ function drawStart(){
   text("Tap to Start", width/2, height/2);
 }
 
-// 🔥 FINAL END SCREEN
+// ✅ NEW HOW TO PLAY
+function drawHowTo(){
+  background(255,240,245);
+
+  textAlign(CENTER, CENTER);
+  fill(0);
+
+  textSize(24);
+  text("How to Play", width/2, height/2 - 80);
+
+  textSize(16);
+  text("Tilt / Arrow Keys to move", width/2, height/2 - 20);
+  text("Tap to jump", width/2, height/2 + 10);
+  text("Collect any 3 products", width/2, height/2 + 40);
+
+  textSize(14);
+  text("Tap to continue", width/2, height/2 + 100);
+}
+
+// END
 function drawEnd(){
 
   background(255,240,245);
@@ -273,7 +288,13 @@ function drawEnd(){
 // INPUT
 function touchStarted(){
 
+  // ✅ UPDATED FLOW
   if(gameState === "start"){
+    gameState = "how";
+    return false;
+  }
+
+  if(gameState === "how"){
     gameState = "play";
     startTime = millis();
     return false;
