@@ -6,12 +6,39 @@ let platforms = [];
 let products = [];
 let slots = [null, null, null];
 
-let productList = ["Kajal","Blush","Lip Tint","Sunscreen","Mascara","Compact"];
+// ✅ UPDATED PRODUCT LIST
+let productList = ["Kajal","Blush","Lip Tint","Mascara","Lip Liner"];
 
 let gameState = "start";
 
 let startTime;
 let timer = 0;
+
+// IMAGES
+let startImg, howToImg, endImg;
+let startBtnImg, restartBtnImg;
+let platformImg, timerIconImg;
+let productImgs = {};
+
+function preload(){
+
+  startImg = loadImage("assets/start.png");
+  howToImg = loadImage("assets/howto.png");
+  endImg = loadImage("assets/end.png");
+
+  startBtnImg = loadImage("assets/startbtn.png");
+  restartBtnImg = loadImage("assets/restartbtn.png");
+
+  platformImg = loadImage("assets/platform.png");
+  timerIconImg = loadImage("assets/timer.png");
+
+  // PRODUCTS
+  productImgs["Kajal"] = loadImage("assets/kajal.png");
+  productImgs["Blush"] = loadImage("assets/blush.png");
+  productImgs["Lip Tint"] = loadImage("assets/liptint.png");
+  productImgs["Mascara"] = loadImage("assets/mascara.png");
+  productImgs["Lip Liner"] = loadImage("assets/lipliner.png");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -23,8 +50,8 @@ function initGame(){
   player = {
     x: width/2,
     y: height - 150,
-    w: 30,
-    h: 40,
+    w: 50,
+    h: 60,
     velY: 0
   };
 
@@ -32,7 +59,6 @@ function initGame(){
   products = [];
   slots = [null, null, null];
 
-  // START PLATFORM
   platforms.push({
     x: width/2 - 60,
     y: height - 80,
@@ -47,20 +73,16 @@ function initGame(){
 
     let y = height - 80 - i * gap;
 
-    // ✅ REMOVED BOOST (all normal now)
-    let type = "normal";
-
     let p = {
       x: random(40, width-140),
       y: y,
       w: 120,
       h: 20,
-      type: type
+      type: "normal"
     };
 
     platforms.push(p);
 
-    // PRODUCTS (NO REPEAT + SPACING)
     if(i % 3 === 0 && products.length < productList.length){
       products.push({
         x: p.x + 50,
@@ -73,14 +95,13 @@ function initGame(){
 
 function draw(){
 
-  background(255,240,245);
+  image(startImg, 0, 0, width, height);
 
   if(gameState === "start"){
     drawStart();
     return;
   }
 
-  // ✅ NEW HOW SCREEN
   if(gameState === "how"){
     drawHowTo();
     return;
@@ -102,13 +123,11 @@ function draw(){
   drawSlots();
   drawTimer();
 
-  // FALL CHECK
   if(player.y > height){
     gameState = "start";
     initGame();
   }
 
-  // END CONDITION
   if(!slots.includes(null)){
     gameState = "end";
   }
@@ -132,13 +151,12 @@ function updatePlayer(){
        player.y + player.h < p.y + 25 &&
        player.velY > 0){
 
-        // ✅ ONLY NORMAL JUMP NOW
         player.velY = jumpForce;
     }
   }
 }
 
-// WORLD MOVEMENT
+// WORLD
 function moveWorld(){
 
   if(player.y < height * 0.4){
@@ -163,13 +181,7 @@ function drawProducts(){
 
     let p = products[i];
 
-    fill(255,180,200);
-    ellipse(p.x, p.y, 40);
-
-    fill(0);
-    textSize(10);
-    textAlign(CENTER);
-    text(p.label, p.x, p.y);
+    image(productImgs[p.label], p.x-25, p.y-25, 50, 50);
 
     if(dist(player.x, player.y, p.x, p.y) < 45){
       collect(p.label);
@@ -183,20 +195,20 @@ function collect(label){
   if(i !== -1) slots[i] = label;
 }
 
-// DRAW
+// PLATFORMS
 function drawPlatforms(){
   for(let p of platforms){
-    fill(180);
-    rect(p.x, p.y, p.w, p.h, 10);
+    image(platformImg, p.x, p.y, p.w, p.h);
   }
 }
 
+// PLAYER
 function drawPlayer(){
   fill(0,200,255);
   rect(player.x, player.y, player.w, player.h,10);
 }
 
-// UI
+// SLOTS
 function drawSlots(){
 
   let spacing = 90;
@@ -206,91 +218,55 @@ function drawSlots(){
     let x = startX + i*spacing;
     let y = height - 90;
 
-    fill(255);
-    rect(x, y, 70, 70, 12);
-
     if(slots[i]){
-      fill(0);
-      textSize(10);
-      textAlign(CENTER,CENTER);
-      text(slots[i], x+35, y+35);
+      image(productImgs[slots[i]], x, y, 70, 70);
     }
   }
 }
 
+// TIMER
 function drawTimer(){
+
+  image(timerIconImg, 20, 15, 25, 25);
+
   fill(0);
   textSize(16);
-  text("Time: " + timer + "s", 20, 30);
+  text(timer + "s", 50, 32);
 }
 
 // START
 function drawStart(){
-  textAlign(CENTER,CENTER);
-  textSize(26);
-  fill(0);
-  text("Tap to Start", width/2, height/2);
+  image(startImg, 0, 0, width, height);
+  image(startBtnImg, width/2 - 120, height - 220, 240, 100);
 }
 
-// ✅ NEW HOW TO PLAY
+// HOW
 function drawHowTo(){
-  background(255,240,245);
-
-  textAlign(CENTER, CENTER);
-  fill(0);
-
-  textSize(24);
-  text("How to Play", width/2, height/2 - 80);
-
-  textSize(16);
-  text("Tilt / Arrow Keys to move", width/2, height/2 - 20);
-  text("Tap to jump", width/2, height/2 + 10);
-  text("Collect any 3 products", width/2, height/2 + 40);
-
-  textSize(14);
-  text("Tap to continue", width/2, height/2 + 100);
+  image(howToImg, 0, 0, width, height);
 }
 
 // END
 function drawEnd(){
 
-  background(255,240,245);
+  image(endImg, 0, 0, width, height);
 
-  textAlign(CENTER);
-  fill(0);
-
-  textSize(28);
-  text("Your Picks ✨", width/2, 100);
-
-  for(let i=0;i<3;i++){
-    let x = width/2 - 120 + i*120;
-
-    fill(255);
-    rect(x,150,90,90,15);
-
-    if(slots[i]){
-      fill(0);
-      textSize(12);
-      text(slots[i], x+45, 200);
-    }
-  }
-
-  textSize(20);
-  text("Time: " + timer + "s", width/2, 300);
-
-  textSize(18);
-  text("Use Code: NYKAA20 💖", width/2, 340);
-
-  textSize(14);
-  text("Tap to restart", width/2, 380);
+  image(restartBtnImg, width/2 - 120, height - 250, 240, 100);
 }
 
 // INPUT
 function touchStarted(){
 
-  // ✅ UPDATED FLOW
   if(gameState === "start"){
-    gameState = "how";
+
+    let bx = width/2 - 120;
+    let by = height - 220;
+
+    if(mouseX > bx && mouseX < bx + 240 &&
+       mouseY > by && mouseY < by + 100){
+
+      gameState = "how";
+    }
+
     return false;
   }
 
@@ -301,8 +277,17 @@ function touchStarted(){
   }
 
   if(gameState === "end"){
-    initGame();
-    gameState = "start";
+
+    let bx = width/2 - 120;
+    let by = height - 250;
+
+    if(mouseX > bx && mouseX < bx + 240 &&
+       mouseY > by && mouseY < by + 100){
+
+      initGame();
+      gameState = "start";
+    }
+
     return false;
   }
 
