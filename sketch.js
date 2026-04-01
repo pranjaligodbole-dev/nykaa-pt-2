@@ -90,32 +90,51 @@ function initGame(){
 
 function draw(){
 
-  background(255); // prevents blank screen
+  background(255); // fallback so screen is never blank
 
   if(gameState === "start"){
-    if(startImg) image(startImg, 0, 0, width, height);
+    if(startImg){
+      image(startImg, 0, 0, width, height);
+    } else {
+      fill(0);
+      textAlign(CENTER, CENTER);
+      textSize(24);
+      text("START SCREEN", width/2, height/2);
+    }
     return;
   }
 
   if(gameState === "how"){
-    if(howToImg) image(howToImg, 0, 0, width, height);
+    if(howToImg){
+      image(howToImg, 0, 0, width, height);
+    } else {
+      text("HOW TO PLAY", width/2, height/2);
+    }
     return;
   }
 
   if(gameState === "end"){
-    if(endImg) image(endImg, 0, 0, width, height);
+    if(endImg){
+      image(endImg, 0, 0, width, height);
+    }
     drawSlots();
     drawTimer();
     return;
   }
 
   if(gameState === "lose"){
-    if(restartImg) image(restartImg, 0, 0, width, height);
+    if(restartImg){
+      image(restartImg, 0, 0, width, height);
+    } else {
+      text("YOU LOST", width/2, height/2);
+    }
     return;
   }
 
   // GAMEPLAY
-  if(bgImg) image(bgImg, 0, 0, width, height);
+  if(bgImg){
+    image(bgImg, 0, 0, width, height);
+  }
 
   timer = floor((millis() - startTime)/1000);
 
@@ -136,7 +155,6 @@ function draw(){
     gameState = "end";
   }
 }
-
 // PLAYER
 function updatePlayer(){
 
