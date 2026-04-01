@@ -90,29 +90,32 @@ function initGame(){
 
 function draw(){
 
+  background(255); // prevents blank screen
+
   if(gameState === "start"){
-    image(startImg, 0, 0, width, height);
+    if(startImg) image(startImg, 0, 0, width, height);
     return;
   }
 
   if(gameState === "how"){
-    image(howToImg, 0, 0, width, height);
+    if(howToImg) image(howToImg, 0, 0, width, height);
     return;
   }
 
   if(gameState === "end"){
-    image(endImg, 0, 0, width, height);
+    if(endImg) image(endImg, 0, 0, width, height);
     drawSlots();
     drawTimer();
     return;
   }
 
   if(gameState === "lose"){
-    image(restartImg, 0, 0, width, height);
+    if(restartImg) image(restartImg, 0, 0, width, height);
     return;
   }
 
-  image(bgImg, 0, 0, width, height);
+  // GAMEPLAY
+  if(bgImg) image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
 
@@ -182,8 +185,10 @@ function drawProducts(){
 
     let p = products[i];
 
-    if(productImgs[p.label]){
-      image(productImgs[p.label], p.x-25, p.y-25, 50, 50);
+    let img = productImgs[p.label];
+
+    if(img){
+      image(img, p.x-25, p.y-25, 50, 50);
     }
 
     if(dist(player.x, player.y, p.x, p.y) < 45){
@@ -201,16 +206,18 @@ function collect(label){
 // PLATFORMS
 function drawPlatforms(){
   for(let p of platforms){
-    image(platformImg, p.x, p.y, p.w, p.h);
+    if(platformImg) image(platformImg, p.x, p.y, p.w, p.h);
   }
 }
 
 // PLAYER
 function drawPlayer(){
-  image(characterImg, player.x, player.y, player.w, player.h);
+  if(characterImg){
+    image(characterImg, player.x, player.y, player.w, player.h);
+  }
 }
 
-// SLOTS (FIXED FOR END SCREEN)
+// SLOTS (SAFE)
 function drawSlots(){
 
   if(gameState === "end"){
@@ -223,8 +230,10 @@ function drawSlots(){
       let x = startX + i*spacing;
       let y = pouchY;
 
-      if(slots[i] && productImgs[slots[i]]){
-        image(productImgs[slots[i]], x, y, 80, 80);
+      let img = productImgs[slots[i]];
+
+      if(slots[i] && img){
+        image(img, x, y, 80, 80);
       }
     }
 
@@ -237,15 +246,19 @@ function drawSlots(){
       let x = startX + i*spacing;
       let y = height - 90;
 
-      if(slots[i] && productImgs[slots[i]]){
-        image(productImgs[slots[i]], x, y, 70, 70);
+      let img = productImgs[slots[i]];
+
+      if(slots[i] && img){
+        image(img, x, y, 70, 70);
       }
     }
   }
 }
 
-// TIMER (FIXED FOR END SCREEN)
+// TIMER (SAFE)
 function drawTimer(){
+
+  if(!timerImg) return;
 
   if(gameState === "end"){
 
