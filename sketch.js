@@ -113,14 +113,23 @@ function draw(){
     return;
   }
 
-  if(gameState === "end"){
-    if(endImg){
-      image(endImg, 0, 0, width, height);
+ if(gameState === "end"){
+
+  let pouchY = height * 0.38;   // move UP into pouch
+  let spacing = 105;             // tighter spacing
+  let startX = width/2 - spacing;
+
+  for(let i=0;i<3;i++){
+    let x = startX + i*spacing;
+    let y = pouchY;
+
+    let img = productImgs[slots[i]];
+
+    if(slots[i] && img){
+      image(img, x, y, 70, 70); // slightly smaller = fits nicely
     }
-    drawSlots();
-    drawTimer();
-    return;
   }
+
 
   if(gameState === "lose"){
     if(restartImg){
