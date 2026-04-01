@@ -6,7 +6,6 @@ let platforms = [];
 let products = [];
 let slots = [null, null, null];
 
-// ✅ UPDATED PRODUCT LIST
 let productList = ["Kajal","Blush","Lip Tint","Mascara","Lip Liner"];
 
 let gameState = "start";
@@ -15,9 +14,8 @@ let startTime;
 let timer = 0;
 
 // IMAGES
-let startImg, howToImg, endImg;
-let startBtnImg, restartBtnImg;
-let platformImg, timerIconImg;
+let startImg, howToImg, endImg, restartImg, bgImg;
+let characterImg, platformImg, timerImg;
 let productImgs = {};
 
 function preload(){
@@ -25,14 +23,13 @@ function preload(){
   startImg = loadImage("assets/start.png");
   howToImg = loadImage("assets/howto.png");
   endImg = loadImage("assets/end.png");
+  restartImg = loadImage("assets/restart.png");
+  bgImg = loadImage("assets/bg.png");
 
-  startBtnImg = loadImage("assets/startbtn.png");
-  restartBtnImg = loadImage("assets/restartbtn.png");
-
+  characterImg = loadImage("assets/character.png");
   platformImg = loadImage("assets/platform.png");
-  timerIconImg = loadImage("assets/timer.png");
+  timerImg = loadImage("assets/timer.png");
 
-  // PRODUCTS
   productImgs["Kajal"] = loadImage("assets/kajal.png");
   productImgs["Blush"] = loadImage("assets/blush.png");
   productImgs["Lip Tint"] = loadImage("assets/liptint.png");
@@ -50,8 +47,8 @@ function initGame(){
   player = {
     x: width/2,
     y: height - 150,
-    w: 50,
-    h: 60,
+    w: 60,
+    h: 80,
     velY: 0
   };
 
@@ -63,8 +60,7 @@ function initGame(){
     x: width/2 - 60,
     y: height - 80,
     w: 120,
-    h: 20,
-    type: "normal"
+    h: 20
   });
 
   let gap = 120;
@@ -77,8 +73,7 @@ function initGame(){
       x: random(40, width-140),
       y: y,
       w: 120,
-      h: 20,
-      type: "normal"
+      h: 20
     };
 
     platforms.push(p);
@@ -95,22 +90,32 @@ function initGame(){
 
 function draw(){
 
-  image(startImg, 0, 0, width, height);
-
+  // START
   if(gameState === "start"){
-    drawStart();
+    image(startImg, 0, 0, width, height);
     return;
   }
 
+  // HOW
   if(gameState === "how"){
-    drawHowTo();
+    image(howToImg, 0, 0, width, height);
     return;
   }
 
+  // WIN
   if(gameState === "end"){
-    drawEnd();
+    image(endImg, 0, 0, width, height);
     return;
   }
+
+  // LOSE
+  if(gameState === "lose"){
+    image(restartImg, 0, 0, width, height);
+    return;
+  }
+
+  // GAMEPLAY BG
+  image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
 
@@ -123,11 +128,12 @@ function draw(){
   drawSlots();
   drawTimer();
 
+  // FALL → LOSE
   if(player.y > height){
-    gameState = "start";
-    initGame();
+    gameState = "lose";
   }
 
+  // WIN
   if(!slots.includes(null)){
     gameState = "end";
   }
@@ -202,10 +208,9 @@ function drawPlatforms(){
   }
 }
 
-// PLAYER
+// PLAYER IMAGE
 function drawPlayer(){
-  fill(0,200,255);
-  rect(player.x, player.y, player.w, player.h,10);
+  image(characterImg, player.x, player.y, player.w, player.h);
 }
 
 // SLOTS
@@ -224,49 +229,25 @@ function drawSlots(){
   }
 }
 
-// TIMER
+// TIMER (TEXT INSIDE IMAGE)
 function drawTimer(){
 
-  image(timerIconImg, 20, 15, 25, 25);
+  let x = 20;
+  let y = 15;
+
+  image(timerImg, x, y, 120, 50);
 
   fill(0);
   textSize(16);
-  text(timer + "s", 50, 32);
-}
-
-// START
-function drawStart(){
-  image(startImg, 0, 0, width, height);
-  image(startBtnImg, width/2 - 120, height - 220, 240, 100);
-}
-
-// HOW
-function drawHowTo(){
-  image(howToImg, 0, 0, width, height);
-}
-
-// END
-function drawEnd(){
-
-  image(endImg, 0, 0, width, height);
-
-  image(restartBtnImg, width/2 - 120, height - 250, 240, 100);
+  textAlign(CENTER, CENTER);
+  text(timer + "s", x + 60, y + 25);
 }
 
 // INPUT
 function touchStarted(){
 
   if(gameState === "start"){
-
-    let bx = width/2 - 120;
-    let by = height - 220;
-
-    if(mouseX > bx && mouseX < bx + 240 &&
-       mouseY > by && mouseY < by + 100){
-
-      gameState = "how";
-    }
-
+    gameState = "how";
     return false;
   }
 
@@ -276,18 +257,9 @@ function touchStarted(){
     return false;
   }
 
-  if(gameState === "end"){
-
-    let bx = width/2 - 120;
-    let by = height - 250;
-
-    if(mouseX > bx && mouseX < bx + 240 &&
-       mouseY > by && mouseY < by + 100){
-
-      initGame();
-      gameState = "start";
-    }
-
+  if(gameState === "end" || gameState === "lose"){
+    initGame();
+    gameState = "start";
     return false;
   }
 
