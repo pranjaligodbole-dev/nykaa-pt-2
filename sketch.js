@@ -90,32 +90,49 @@ function initGame(){
 
 function draw(){
 
-  background(255);
+  background(240); // NEVER blank
 
   // START
   if(gameState === "start"){
-    if(startImg) image(startImg, 0, 0, width, height);
+    if(startImg){
+      image(startImg, 0, 0, width, height);
+    } else {
+      fill(0);
+      textAlign(CENTER, CENTER);
+      textSize(24);
+      text("Loading...", width/2, height/2);
+    }
     return;
   }
 
   // HOW
   if(gameState === "how"){
-    if(howToImg) image(howToImg, 0, 0, width, height);
+    if(howToImg){
+      image(howToImg, 0, 0, width, height);
+    } else {
+      text("How to Play", width/2, height/2);
+    }
     return;
   }
 
   // LOSE
   if(gameState === "lose"){
-    if(restartImg) image(restartImg, 0, 0, width, height);
+    if(restartImg){
+      image(restartImg, 0, 0, width, height);
+    } else {
+      text("You Lost", width/2, height/2);
+    }
     return;
   }
 
-  // END (ONLY ONE CLEAN RENDER PATH)
+  // END SCREEN (ONLY ONE SYSTEM)
   if(gameState === "end"){
 
-    if(endImg) image(endImg, 0, 0, width, height);
+    if(endImg){
+      image(endImg, 0, 0, width, height);
+    }
 
-    // 👜 PRODUCTS INSIDE POUCH
+    // 👜 PRODUCTS IN POUCH
     let pouchY = height * 0.37;
     let spacing = 95;
     let startX = width/2 - spacing;
@@ -131,7 +148,7 @@ function draw(){
       }
     }
 
-    // ⏱️ TIMER TEXT INSIDE YOUR BOX
+    // ⏱️ TIMER TEXT (NO BOX IMAGE)
     fill(0);
     textSize(20);
     textAlign(CENTER, CENTER);
@@ -140,9 +157,11 @@ function draw(){
     return;
   }
 
-  // ===== GAMEPLAY (UNCHANGED) =====
+  // ===== GAMEPLAY =====
 
-  if(bgImg) image(bgImg, 0, 0, width, height);
+  if(bgImg){
+    image(bgImg, 0, 0, width, height);
+  }
 
   timer = floor((millis() - startTime)/1000);
 
@@ -152,8 +171,8 @@ function draw(){
   drawPlatforms();
   drawProducts();
   drawPlayer();
-  drawSlots();   // gameplay only
-  drawTimer();   // gameplay only
+  drawSlots();
+  drawTimer();
 
   if(player.y > height){
     gameState = "lose";
@@ -211,7 +230,6 @@ function drawProducts(){
   for(let i=products.length-1;i>=0;i--){
 
     let p = products[i];
-
     let img = productImgs[p.label];
 
     if(img){
