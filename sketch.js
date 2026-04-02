@@ -91,7 +91,7 @@ function initGame(){
 
 function draw(){
 
-  background(255); // fallback so screen is never blank
+  background(255);
 
   if(gameState === "start"){
     if(startImg){
@@ -114,24 +114,6 @@ function draw(){
     return;
   }
 
- if(gameState === "end"){
-
-  let pouchY = height * 0.38;   // move UP into pouch
-  let spacing = 105;             // tighter spacing
-  let startX = width/2 - spacing;
-
-  for(let i=0;i<3;i++){
-    let x = startX + i*spacing;
-    let y = pouchY;
-
-    let img = productImgs[slots[i]];
-
-    if(slots[i] && img){
-      image(img, x, y, 70, 70); // slightly smaller = fits nicely
-    }
-  }
-
-
   if(gameState === "lose"){
     if(restartImg){
       image(restartImg, 0, 0, width, height);
@@ -141,7 +123,39 @@ function draw(){
     return;
   }
 
-  // GAMEPLAY
+  if(gameState === "end"){
+
+    // background
+    if(endImg){
+      image(endImg, 0, 0, width, height);
+    }
+
+    // 👜 PRODUCTS INSIDE POUCH
+    let pouchY = height * 0.37;
+    let spacing = 95;
+    let startX = width/2 - spacing;
+
+    for(let i=0;i<3;i++){
+      let label = slots[i];
+      let img = productImgs[label];
+
+      if(label && img){
+        let x = startX + i*spacing;
+        let y = pouchY;
+        image(img, x, y, 70, 70);
+      }
+    }
+
+    // ⏱️ TIMER TEXT (NO BOX IMAGE)
+    fill(0);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text(timer + "s", width/2, height * 0.605);
+
+    return;
+  }
+
+  // GAMEPLAY (UNCHANGED)
   if(bgImg){
     image(bgImg, 0, 0, width, height);
   }
