@@ -90,78 +90,46 @@ function initGame(){
 
 function draw(){
 
-  background(240); // NEVER blank
+  background(255);
 
-  // START
   if(gameState === "start"){
-    if(startImg){
-      image(startImg, 0, 0, width, height);
-    } else {
-      fill(0);
-      textAlign(CENTER, CENTER);
-      textSize(24);
-      text("Loading...", width/2, height/2);
-    }
+    image(startImg, 0, 0, width, height);
     return;
   }
 
-  // HOW
   if(gameState === "how"){
-    if(howToImg){
-      image(howToImg, 0, 0, width, height);
-    } else {
-      text("How to Play", width/2, height/2);
-    }
+    image(howToImg, 0, 0, width, height);
     return;
   }
 
-  // LOSE
-  if(gameState === "lose"){
-    if(restartImg){
-      image(restartImg, 0, 0, width, height);
-    } else {
-      text("You Lost", width/2, height/2);
-    }
-    return;
-  }
-
-  // END SCREEN (ONLY ONE SYSTEM)
   if(gameState === "end"){
+    image(endImg, 0, 0, width, height);
 
-    if(endImg){
-      image(endImg, 0, 0, width, height);
-    }
-
-    // 👜 PRODUCTS IN POUCH
-    let pouchY = height * 0.37;
-    let spacing = 95;
+    // SIMPLE SLOTS (OLD STYLE — WORKING)
+    let spacing = 90;
     let startX = width/2 - spacing;
 
     for(let i=0;i<3;i++){
-      let label = slots[i];
-      let img = productImgs[label];
+      let x = startX + i*spacing;
+      let y = height - 120;
 
-      if(label && img){
-        let x = startX + i*spacing;
-        let y = pouchY;
+      let img = productImgs[slots[i]];
+
+      if(slots[i] && img){
         image(img, x, y, 70, 70);
       }
     }
 
-    // ⏱️ TIMER TEXT (NO BOX IMAGE)
-    fill(0);
-    textSize(20);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", width/2, height * 0.605);
-
     return;
   }
 
-  // ===== GAMEPLAY =====
-
-  if(bgImg){
-    image(bgImg, 0, 0, width, height);
+  if(gameState === "lose"){
+    image(restartImg, 0, 0, width, height);
+    return;
   }
+
+  // GAMEPLAY
+  image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
 
@@ -230,6 +198,7 @@ function drawProducts(){
   for(let i=products.length-1;i>=0;i--){
 
     let p = products[i];
+
     let img = productImgs[p.label];
 
     if(img){
@@ -251,18 +220,16 @@ function collect(label){
 // PLATFORMS
 function drawPlatforms(){
   for(let p of platforms){
-    if(platformImg) image(platformImg, p.x, p.y, p.w, p.h);
+    image(platformImg, p.x, p.y, p.w, p.h);
   }
 }
 
 // PLAYER
 function drawPlayer(){
-  if(characterImg){
-    image(characterImg, player.x, player.y, player.w, player.h);
-  }
+  image(characterImg, player.x, player.y, player.w, player.h);
 }
 
-// SLOTS (GAMEPLAY ONLY)
+// SLOTS (GAMEPLAY)
 function drawSlots(){
 
   let spacing = 90;
@@ -280,10 +247,8 @@ function drawSlots(){
   }
 }
 
-// TIMER (GAMEPLAY ONLY)
+// TIMER
 function drawTimer(){
-
-  if(!timerImg) return;
 
   image(timerImg, 20, 15, 120, 50);
 
