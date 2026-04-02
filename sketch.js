@@ -123,37 +123,36 @@ function draw(){
     return;
   }
 
-  if(gameState === "end"){
+if(gameState === "end"){
 
-    // background
-    if(endImg){
-      image(endImg, 0, 0, width, height);
-    }
-
-    // 👜 PRODUCTS INSIDE POUCH
-    let pouchY = height * 0.37;
-    let spacing = 95;
-    let startX = width/2 - spacing;
-
-    for(let i=0;i<3;i++){
-      let label = slots[i];
-      let img = productImgs[label];
-
-      if(label && img){
-        let x = startX + i*spacing;
-        let y = pouchY;
-        image(img, x, y, 70, 70);
-      }
-    }
-
-    // ⏱️ TIMER TEXT (NO BOX IMAGE)
-    fill(0);
-    textSize(20);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", width/2, height * 0.605);
-
-    return;
+  if(endImg){
+    image(endImg, 0, 0, width, height);
   }
+
+  // 👜 PRODUCTS (ONLY THIS, no drawSlots())
+  let pouchY = height * 0.37;
+  let spacing = 95;
+  let startX = width/2 - spacing;
+
+  for(let i=0;i<3;i++){
+    let label = slots[i];
+    let img = productImgs[label];
+
+    if(label && img){
+      let x = startX + i*spacing;
+      let y = pouchY;
+      image(img, x, y, 70, 70);
+    }
+  }
+
+  // ⏱️ TIMER (TEXT ONLY, NO IMAGE)
+  fill(0);
+  textSize(20);
+  textAlign(CENTER, CENTER);
+  text(timer + "s", width/2, height * 0.605);
+
+  return;
+}
 
   // GAMEPLAY (UNCHANGED)
   if(bgImg){
