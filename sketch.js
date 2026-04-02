@@ -1,3 +1,4 @@
+window.onload = () => {};
 let player;
 let gravity = 0.5;
 let jumpForce = -13;
