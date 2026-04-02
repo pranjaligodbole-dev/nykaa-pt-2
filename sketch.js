@@ -90,8 +90,6 @@ function initGame(){
 
 function draw(){
 
-  background(255);
-
   if(gameState === "start"){
     image(startImg, 0, 0, width, height);
     return;
@@ -104,22 +102,8 @@ function draw(){
 
   if(gameState === "end"){
     image(endImg, 0, 0, width, height);
-
-    // SIMPLE SLOTS (OLD STYLE — WORKING)
-    let spacing = 90;
-    let startX = width/2 - spacing;
-
-    for(let i=0;i<3;i++){
-      let x = startX + i*spacing;
-      let y = height - 120;
-
-      let img = productImgs[slots[i]];
-
-      if(slots[i] && img){
-        image(img, x, y, 70, 70);
-      }
-    }
-
+    drawSlots();
+    drawTimer();
     return;
   }
 
@@ -128,7 +112,6 @@ function draw(){
     return;
   }
 
-  // GAMEPLAY
   image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
@@ -199,10 +182,8 @@ function drawProducts(){
 
     let p = products[i];
 
-    let img = productImgs[p.label];
-
-    if(img){
-      image(img, p.x-25, p.y-25, 50, 50);
+    if(productImgs[p.label]){
+      image(productImgs[p.label], p.x-25, p.y-25, 50, 50);
     }
 
     if(dist(player.x, player.y, p.x, p.y) < 45){
@@ -229,33 +210,64 @@ function drawPlayer(){
   image(characterImg, player.x, player.y, player.w, player.h);
 }
 
-// SLOTS (GAMEPLAY)
+// SLOTS (FIXED FOR END SCREEN)
 function drawSlots(){
 
-  let spacing = 90;
-  let startX = width/2 - spacing;
+  if(gameState === "end"){
 
-  for(let i=0;i<3;i++){
-    let x = startX + i*spacing;
-    let y = height - 90;
+    let pouchY = height * 0.42;
+    let spacing = 110;
+    let startX = width/2 - spacing;
 
-    let img = productImgs[slots[i]];
+    for(let i=0;i<3;i++){
+      let x = startX + i*spacing;
+      let y = pouchY;
 
-    if(slots[i] && img){
-      image(img, x, y, 70, 70);
+      if(slots[i] && productImgs[slots[i]]){
+        image(productImgs[slots[i]], x, y, 80, 80);
+      }
+    }
+
+  } else {
+
+    let spacing = 90;
+    let startX = width/2 - spacing;
+
+    for(let i=0;i<3;i++){
+      let x = startX + i*spacing;
+      let y = height - 90;
+
+      if(slots[i] && productImgs[slots[i]]){
+        image(productImgs[slots[i]], x, y, 70, 70);
+      }
     }
   }
 }
 
-// TIMER
+// TIMER (FIXED FOR END SCREEN)
 function drawTimer(){
 
-  image(timerImg, 20, 15, 120, 50);
+  if(gameState === "end"){
 
-  fill(0);
-  textSize(16);
-  textAlign(CENTER, CENTER);
-  text(timer + "s", 80, 40);
+    let boxX = width/2 - 80;
+    let boxY = height * 0.60;
+
+    image(timerImg, boxX, boxY, 160, 60);
+
+    fill(0);
+    textSize(18);
+    textAlign(CENTER, CENTER);
+    text(timer + "s", boxX + 80, boxY + 30);
+
+  } else {
+
+    image(timerImg, 20, 15, 120, 50);
+
+    fill(0);
+    textSize(16);
+    textAlign(CENTER, CENTER);
+    text(timer + "s", 80, 40);
+  }
 }
 
 // INPUT
