@@ -19,7 +19,15 @@ let characterImg, platformImg, timerImg;
 let productImgs = {};
 
 function preload(){
+  // ❌ intentionally empty (prevents mobile loading crash)
+}
 
+function setup() {
+
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+
+  // ✅ LOAD IMAGES HERE (non-blocking)
   startImg = loadImage("assets/start.png");
   howToImg = loadImage("assets/howto.png");
   endImg = loadImage("assets/end.png");
@@ -35,10 +43,7 @@ function preload(){
   productImgs["Lip Tint"] = loadImage("assets/liptint.png");
   productImgs["Mascara"] = loadImage("assets/mascara.png");
   productImgs["Lip Liner"] = loadImage("assets/lipliner.png");
-}
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
   initGame();
 }
 
@@ -90,29 +95,46 @@ function initGame(){
 
 function draw(){
 
+  background(255);
+
   if(gameState === "start"){
-    image(startImg, 0, 0, width, height);
+    if(startImg) image(startImg, 0, 0, width, height);
     return;
   }
 
   if(gameState === "how"){
-    image(howToImg, 0, 0, width, height);
+    if(howToImg) image(howToImg, 0, 0, width, height);
     return;
   }
 
   if(gameState === "end"){
-    image(endImg, 0, 0, width, height);
-    drawSlots();
-    drawTimer();
+    if(endImg) image(endImg, 0, 0, width, height);
+
+    // SIMPLE SLOTS (stable version)
+    let spacing = 90;
+    let startX = width/2 - spacing;
+
+    for(let i=0;i<3;i++){
+      let x = startX + i*spacing;
+      let y = height - 120;
+
+      let img = productImgs[slots[i]];
+
+      if(slots[i] && img){
+        image(img, x, y, 70, 70);
+      }
+    }
+
     return;
   }
 
   if(gameState === "lose"){
-    image(restartImg, 0, 0, width, height);
+    if(restartImg) image(restartImg, 0, 0, width, height);
     return;
   }
 
-  image(bgImg, 0, 0, width, height);
+  // GAMEPLAY
+  if(bgImg) image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
 
@@ -182,8 +204,10 @@ function drawProducts(){
 
     let p = products[i];
 
-    if(productImgs[p.label]){
-      image(productImgs[p.label], p.x-25, p.y-25, 50, 50);
+    let img = productImgs[p.label];
+
+    if(img){
+      image(img, p.x-25, p.y-25, 50, 50);
     }
 
     if(dist(player.x, player.y, p.x, p.y) < 45){
@@ -201,73 +225,46 @@ function collect(label){
 // PLATFORMS
 function drawPlatforms(){
   for(let p of platforms){
-    image(platformImg, p.x, p.y, p.w, p.h);
+    if(platformImg) image(platformImg, p.x, p.y, p.w, p.h);
   }
 }
 
 // PLAYER
 function drawPlayer(){
-  image(characterImg, player.x, player.y, player.w, player.h);
+  if(characterImg){
+    image(characterImg, player.x, player.y, player.w, player.h);
+  }
 }
 
-// SLOTS (FIXED FOR END SCREEN)
+// SLOTS
 function drawSlots(){
 
-  if(gameState === "end"){
+  let spacing = 90;
+  let startX = width/2 - spacing;
 
-    let pouchY = height * 0.42;
-    let spacing = 110;
-    let startX = width/2 - spacing;
+  for(let i=0;i<3;i++){
+    let x = startX + i*spacing;
+    let y = height - 90;
 
-    for(let i=0;i<3;i++){
-      let x = startX + i*spacing;
-      let y = pouchY;
+    let img = productImgs[slots[i]];
 
-      if(slots[i] && productImgs[slots[i]]){
-        image(productImgs[slots[i]], x, y, 80, 80);
-      }
-    }
-
-  } else {
-
-    let spacing = 90;
-    let startX = width/2 - spacing;
-
-    for(let i=0;i<3;i++){
-      let x = startX + i*spacing;
-      let y = height - 90;
-
-      if(slots[i] && productImgs[slots[i]]){
-        image(productImgs[slots[i]], x, y, 70, 70);
-      }
+    if(slots[i] && img){
+      image(img, x, y, 70, 70);
     }
   }
 }
 
-// TIMER (FIXED FOR END SCREEN)
+// TIMER
 function drawTimer(){
 
-  if(gameState === "end"){
-
-    let boxX = width/2 - 80;
-    let boxY = height * 0.60;
-
-    image(timerImg, boxX, boxY, 160, 60);
-
-    fill(0);
-    textSize(18);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", boxX + 80, boxY + 30);
-
-  } else {
-
+  if(timerImg){
     image(timerImg, 20, 15, 120, 50);
-
-    fill(0);
-    textSize(16);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", 80, 40);
   }
+
+  fill(0);
+  textSize(16);
+  textAlign(CENTER, CENTER);
+  text(timer + "s", 80, 40);
 }
 
 // INPUT
