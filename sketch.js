@@ -25,7 +25,7 @@ function preload(){
 function setup() {
 
   createCanvas(windowWidth, windowHeight);
-  pixelDensity(1);
+  pixelDensity(displayDensity());
 
   // ✅ LOAD IMAGES HERE (non-blocking)
   startImg = loadImage("assets/start.png");
