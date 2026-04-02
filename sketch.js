@@ -107,26 +107,33 @@ function draw(){
     return;
   }
 
-  if(gameState === "end"){
-    if(endImg) image(endImg, 0, 0, width, height);
+if(gameState === "end"){
+  if(endImg) image(endImg, 0, 0, width, height);
 
-    // SIMPLE SLOTS (stable version)
-    let spacing = 90;
-    let startX = width/2 - spacing;
+  // 👜 PRODUCTS (moved UP into pouch)
+  let pouchY = height * 0.34;
+  let spacing = 95;
+  let startX = width/2 - spacing;
 
-    for(let i=0;i<3;i++){
+  for(let i=0;i<3;i++){
+    let label = slots[i];
+    let img = productImgs[label];
+
+    if(label && img){
       let x = startX + i*spacing;
-      let y = height - 120;
-
-      let img = productImgs[slots[i]];
-
-      if(slots[i] && img){
-        image(img, x, y, 70, 70);
-      }
+      let y = pouchY;
+      image(img, x, y, 70, 70);
     }
-
-    return;
   }
+
+  // ⏱️ TIMER TEXT INSIDE YOUR TIMER BOX
+  fill(0);
+  textSize(20);
+  textAlign(CENTER, CENTER);
+  text(timer + "s", width/2, height * 0.595);
+
+  return;
+}
 
   if(gameState === "lose"){
     if(restartImg) image(restartImg, 0, 0, width, height);
