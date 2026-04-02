@@ -1,4 +1,5 @@
 window.onload = () => {};
+
 let player;
 let gravity = 0.5;
 let jumpForce = -13;
@@ -111,12 +112,12 @@ function draw(){
     return;
   }
 
-  // END (CLEAN, ISOLATED)
+  // END (ONLY ONE CLEAN RENDER PATH)
   if(gameState === "end"){
 
     if(endImg) image(endImg, 0, 0, width, height);
 
-    // 👜 products in pouch
+    // 👜 PRODUCTS INSIDE POUCH
     let pouchY = height * 0.37;
     let spacing = 95;
     let startX = width/2 - spacing;
@@ -132,7 +133,7 @@ function draw(){
       }
     }
 
-    // ⏱️ timer text only
+    // ⏱️ TIMER TEXT INSIDE YOUR BOX
     fill(0);
     textSize(20);
     textAlign(CENTER, CENTER);
@@ -153,8 +154,8 @@ function draw(){
   drawPlatforms();
   drawProducts();
   drawPlayer();
-  drawSlots();   // gameplay UI only
-  drawTimer();   // gameplay UI only
+  drawSlots();   // gameplay only
+  drawTimer();   // gameplay only
 
   if(player.y > height){
     gameState = "lose";
@@ -164,6 +165,7 @@ function draw(){
     gameState = "end";
   }
 }
+
 // PLAYER
 function updatePlayer(){
 
@@ -244,70 +246,35 @@ function drawPlayer(){
   }
 }
 
-// SLOTS (SAFE)
+// SLOTS (GAMEPLAY ONLY)
 function drawSlots(){
 
-  if(gameState === "end"){
+  let spacing = 90;
+  let startX = width/2 - spacing;
 
-    let pouchY = height * 0.42;
-    let spacing = 110;
-    let startX = width/2 - spacing;
+  for(let i=0;i<3;i++){
+    let x = startX + i*spacing;
+    let y = height - 90;
 
-    for(let i=0;i<3;i++){
-      let x = startX + i*spacing;
-      let y = pouchY;
+    let img = productImgs[slots[i]];
 
-      let img = productImgs[slots[i]];
-
-      if(slots[i] && img){
-        image(img, x, y, 80, 80);
-      }
-    }
-
-  } else {
-
-    let spacing = 90;
-    let startX = width/2 - spacing;
-
-    for(let i=0;i<3;i++){
-      let x = startX + i*spacing;
-      let y = height - 90;
-
-      let img = productImgs[slots[i]];
-
-      if(slots[i] && img){
-        image(img, x, y, 70, 70);
-      }
+    if(slots[i] && img){
+      image(img, x, y, 70, 70);
     }
   }
 }
 
-// TIMER (SAFE)
+// TIMER (GAMEPLAY ONLY)
 function drawTimer(){
 
   if(!timerImg) return;
 
-  if(gameState === "end"){
+  image(timerImg, 20, 15, 120, 50);
 
-    let boxX = width/2 - 80;
-    let boxY = height * 0.60;
-
-    image(timerImg, boxX, boxY, 160, 60);
-
-    fill(0);
-    textSize(18);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", boxX + 80, boxY + 30);
-
-  } else {
-
-    image(timerImg, 20, 15, 120, 50);
-
-    fill(0);
-    textSize(16);
-    textAlign(CENTER, CENTER);
-    text(timer + "s", 80, 40);
-  }
+  fill(0);
+  textSize(16);
+  textAlign(CENTER, CENTER);
+  text(timer + "s", 80, 40);
 }
 
 // INPUT
