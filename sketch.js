@@ -113,7 +113,7 @@ if(gameState === "end"){
   // 👜 PRODUCTS (moved UP into pouch)
   let pouchY = height * 0.34;
   let spacing = 95;
-  let startX = width/2 - spacing - 15;
+  let startX = width/2 - spacing - 20;
 
   for(let i=0;i<3;i++){
     let label = slots[i];
@@ -130,7 +130,7 @@ if(gameState === "end"){
   fill(0);
   textSize(20);
   textAlign(CENTER, CENTER);
-  text(timer + "s", width/2, height * 0.59);
+  text(timer + "s", width/2, height * 0.61);
 
   return;
 }
