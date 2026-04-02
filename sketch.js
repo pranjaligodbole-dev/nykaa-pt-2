@@ -93,71 +93,57 @@ function draw(){
 
   background(255);
 
+  // START
   if(gameState === "start"){
-    if(startImg){
-      image(startImg, 0, 0, width, height);
-    } else {
-      fill(0);
-      textAlign(CENTER, CENTER);
-      textSize(24);
-      text("START SCREEN", width/2, height/2);
-    }
+    if(startImg) image(startImg, 0, 0, width, height);
     return;
   }
 
+  // HOW
   if(gameState === "how"){
-    if(howToImg){
-      image(howToImg, 0, 0, width, height);
-    } else {
-      text("HOW TO PLAY", width/2, height/2);
-    }
+    if(howToImg) image(howToImg, 0, 0, width, height);
     return;
   }
 
+  // LOSE
   if(gameState === "lose"){
-    if(restartImg){
-      image(restartImg, 0, 0, width, height);
-    } else {
-      text("YOU LOST", width/2, height/2);
-    }
+    if(restartImg) image(restartImg, 0, 0, width, height);
     return;
   }
 
-if(gameState === "end"){
+  // END (CLEAN, ISOLATED)
+  if(gameState === "end"){
 
-  if(endImg){
-    image(endImg, 0, 0, width, height);
-  }
+    if(endImg) image(endImg, 0, 0, width, height);
 
-  // 👜 PRODUCTS (ONLY THIS, no drawSlots())
-  let pouchY = height * 0.37;
-  let spacing = 95;
-  let startX = width/2 - spacing;
+    // 👜 products in pouch
+    let pouchY = height * 0.37;
+    let spacing = 95;
+    let startX = width/2 - spacing;
 
-  for(let i=0;i<3;i++){
-    let label = slots[i];
-    let img = productImgs[label];
+    for(let i=0;i<3;i++){
+      let label = slots[i];
+      let img = productImgs[label];
 
-    if(label && img){
-      let x = startX + i*spacing;
-      let y = pouchY;
-      image(img, x, y, 70, 70);
+      if(label && img){
+        let x = startX + i*spacing;
+        let y = pouchY;
+        image(img, x, y, 70, 70);
+      }
     }
+
+    // ⏱️ timer text only
+    fill(0);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text(timer + "s", width/2, height * 0.605);
+
+    return;
   }
 
-  // ⏱️ TIMER (TEXT ONLY, NO IMAGE)
-  fill(0);
-  textSize(20);
-  textAlign(CENTER, CENTER);
-  text(timer + "s", width/2, height * 0.605);
+  // ===== GAMEPLAY (UNCHANGED) =====
 
-  return;
-}
-
-  // GAMEPLAY (UNCHANGED)
-  if(bgImg){
-    image(bgImg, 0, 0, width, height);
-  }
+  if(bgImg) image(bgImg, 0, 0, width, height);
 
   timer = floor((millis() - startTime)/1000);
 
@@ -167,8 +153,8 @@ if(gameState === "end"){
   drawPlatforms();
   drawProducts();
   drawPlayer();
-  drawSlots();
-  drawTimer();
+  drawSlots();   // gameplay UI only
+  drawTimer();   // gameplay UI only
 
   if(player.y > height){
     gameState = "lose";
